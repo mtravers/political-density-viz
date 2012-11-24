@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
+    <style type="text/css">
+
+svg {
+  font-size: 14px;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  stroke: #ddd;
+  stroke-width: .5px;
+}
+
+.axis path {
+  display: none;
+}
+
+rect.extent {
+  fill: #000;
+  fill-opacity: .125;
+  stroke: #fff;
+}
+
+rect.frame {
+  fill: #fff;
+  fill-opacity: .7;
+  stroke: #aaa;
+}
+
+circle {
+  fill: #ccc;
+  fill-opacity: .5;
+}
+
+.legend circle {
+  fill-opacity: 1;
+}
+
+.legend text {
+  font-size: 18px;
+  font-style: oblique;
+}
+
+.cell text {
+  pointer-events: none;
+}
+
+.datapoint {
+  fill: #111;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <h2 style="font-size:24px;">
+     2012 by-county election data
+      scatterplot matrix
+    </h2>
+    <script type="text/javascript" src="http://d3js.org/d3.v2.js"></script>
+    <script type="text/javascript">
+
+d3.json("data.json", function(counties) {
+  var svg = d3.select("body").append("svg:svg")
+      .attr("width", 800)
+      .attr("height", 800)
+    .append("svg:g")
+//      .attr("transform", "translate(359.5,69.5)")
+   ;
+
+   var make_scale = function(prop,range_min,range_max) {
+     return d3.scale.linear().domain([d3.min(counties, function(c) { return c[prop]; }),
+                                      d3.max(counties, function(c) { return c[prop]; })])
+                             .range([range_min,range_max]);
+                              
+   }
+
+// scaling
+  x_scale = make_scale('log_density', 10, 790);
+  y_scale = make_scale('dem%', 10, 790);
+  population_scale = make_scale('population', 4, 900); // square of radius
+
+// the data
+    svg.selectAll("circle")
+        .data(counties)
+      .enter().append("svg:circle")
+        .attr("class", "datapoint")
+        .attr("cx", function(d) { return x_scale(d['log_density']); })
+        .attr("cy", function(d) { return y_scale(d['dem%']); })
+        .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
+        .append("svg:title").text(function(d) { return d['county'] + ", " + d['state']; });
+
+     }
+ );
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+D3 notes
+US counties colored:
+http://bl.ocks.org/4060606
