@@ -1,3 +1,21 @@
+Todo
+
+V1
+- axes, indenting etc
+- us map
+- brushing
+
+V2
+- changeable vars.
+
+
+
+
+
+
+
 D3 notes
 US counties colored:
 http://bl.ocks.org/4060606
+
+Oh double-dipped fuck, the data this uses refers to counties by name and position. So to recreate the state and match my other data, I’d need to do an actual geometric search. Fuck on a bun.
