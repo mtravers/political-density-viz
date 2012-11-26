@@ -1,6 +1,6 @@
 (setq *by-county-electoral-results*
  '(("Alabama"
-  (("Autauga"
+   (("Autauga"
     (("GOP" 17366) ("Dem" 6354) ("Ind" 136) ("Ind" 31) ("Ind" 22)))
    ("Baldwin"
     (("GOP" 65772) ("Dem" 18329) ("Ind" 597) ("Ind" 168)
@@ -1288,7 +1288,7 @@
    ("Gooding"
     (("GOP" 3696) ("Dem" 1287) ("Lib" 51) ("Ind" 38) ("Ind" 25)
      ("CST" 21)))
-   ("Idaho County"
+   ("Idaho"
     (("GOP" 5821) ("Dem" 1722) ("Lib" 76) ("CST" 59) ("Ind" 47)
      ("Ind" 24)))
    ("Jefferson"

@@ -189,6 +189,16 @@
 	    (mt:collect county-fields)
 	    ))))))
 
+
+(defun add-region-code (+county)
+  (lookup-geo-county (+get :state +county) (+get :county +county)))
+
+    
+(defun lookup-geo-county (state county)
+  (some #'(lambda (c) (and (equal state (+get :state c)) (equal county (+get :name (+get :properties c))) c))
+	*x-counties	))
+
+
 (defun lookup-m-county (state county)
   (find county (cadr (find state *m-county-info* :key #'car :test #'equal))
 	:key #'car :test #'equal))

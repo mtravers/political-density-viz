@@ -1,4 +1,21 @@
+Three data sets:
+- state/county shates: us-counties.json, us-state.json (off d3 site). Has county codes
+- county Pop/Area (from Freebase)
+- electoral results (scraped from politico? and now in big.lisp)
+
+Put together:
+- data/data.json 
+
+
+
 Todo
+
+Credits:
+d3
+http://colorbrewer2.org/
+Politico
+Freebase
+
 
 V1
 - axes, indenting etc
@@ -10,7 +27,9 @@ V2
 
 
 
-
+Todos:
+- data cleaning
+-- counties without area
 
 
 
