@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.counties {
+  stroke: #fff;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.map {fill:rgb(200,255,200)}
+.map .q8 {fill:rgb(178, 24, 43)}
+.map .q7 {fill:rgb(214, 96, 77)}
+.map .q6 {fill:rgb(244, 165, 130)}
+.map .q5 {fill:rgb(253, 219, 199)}
+.map .q4 {fill:rgb(247, 247, 247)}
+.map .q3 {fill:rgb(209, 229, 240)}
+.map .q2 {fill:rgb(146, 197, 222)}
+.map .q1 {fill:rgb(67, 147, 195)}
+.map .q0 {fill:rgb(33, 102, 172)}
+
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script>
+
+var width = 960,
+    height = 500;
+
+var quantize = d3.scale.quantize()
+    .domain([0, 100])
+    .range(d3.range(9).map(function(i) { return "q" + i; }));
+
+var path = d3.geo.path();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("class", "map");
+
+queue()
+    .defer(d3.json, "data/us-counties.json")
+    .defer(d3.json, "data/us-states.json")
+    .defer(d3.json, "data/election-data.json")
+    .await(ready);
+
+function ready(error, counties, states, election) {
+  var rateById = {};
+  election.forEach(function (c) { rateById[c.id] = +c['dem%'];});
+
+
+  svg.append("g")
+      .attr("class", "counties")
+    .selectAll("path")
+      .data(counties.features)
+    .enter().append("path")
+      .attr("class", function(d) { return quantize(rateById[d.id]); })
+      .attr("d", path);
+
+  svg.append("path")
+      .datum(states)
+      .attr("class", "states")
+      .attr("d", path);
+}
+
+</script>
