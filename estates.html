@@ -28,7 +28,8 @@
 
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+<script src="/d3/d3.v2.min.js"></script>
 <script src="http://d3js.org/queue.v1.min.js"></script>
 <script>
 
@@ -47,12 +48,12 @@ var svg = d3.select("body").append("svg")
     .attr("class", "map");
 
 queue()
-    .defer(d3.json, "data/us-counties.json")
+    .defer(d3.json, "data/us-counties-plus.json")
     .defer(d3.json, "data/us-states.json")
     .defer(d3.json, "data/election-data.json")
     .await(ready);
 
-function ready(error, counties, states, election) {
+function ready(counties, states, election) {
   var rateById = {};
   election.forEach(function (c) { rateById[c.id] = +c['dem%'];});
 
@@ -63,7 +64,8 @@ function ready(error, counties, states, election) {
       .data(counties.features)
     .enter().append("path")
       .attr("class", function(d) { return quantize(rateById[d.id]); })
-      .attr("d", path);
+      .attr("d", path)
+      .attr("county", function(d) { return d.properties.name; });
 
   svg.append("path")
       .datum(states)

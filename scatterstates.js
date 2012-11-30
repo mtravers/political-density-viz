@@ -11,12 +11,15 @@ var path = d3.geo.path();
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
-    .attr("height", height)
+    .attr("height", height + s_size)
+
+var map = svg.append("g")
     .attr("class", "map");
 
-var svg2 = d3.select("body").append("svg")
-    .attr("width", s_size)
-    .attr("height", s_size)
+var scatter = svg.append("g")
+//    .attr("width", s_size)
+//    .attr("height", s_size)
+    .attr("transform", "translate(0,500)")
     .attr("class", "scatter");
 
 queue()
@@ -28,21 +31,18 @@ queue()
 function ready(error, counties, states, election) {
     var rateById = {};
     election.forEach(function (c) { rateById[c.id] = +c['dem%'];});
-
-
-    svg.append("g")
-	.attr("class", "counties")
+    map
 	.selectAll("path")
 	.data(counties.features)
 	.enter().append("path")
-	.attr("class", function(d) { return quantize(rateById[d.id]); })
+	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
 	.attr("d", path);
 
-    svg.append("path")
+
+    map.append("path")
 	.datum(states)
 	.attr("class", "states")
 	.attr("d", path);
-
 
     // scatter
 
@@ -57,7 +57,7 @@ function ready(error, counties, states, election) {
     population_scale = make_scale('population', 4, 900); // square of radius
 
 
-    svg2.selectAll("circle")
+    scatter.selectAll("circle")
         .data(election)
         .enter().append("svg:circle")
         .attr("class", "datapoint")
@@ -66,36 +66,39 @@ function ready(error, counties, states, election) {
         .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
         .append("svg:title").text(function(d) { return d['county'] + ", " + d['state']; });
 
-
     // Brush.
     var brush = d3.svg.brush()
 	.on("brushstart", brushstart)
 	.on("brush", brush)
 	.on("brushend", brushend);
 
-    svg2.append("g")
+    scatter.append("g")
       .attr("class", "brush")
       .call(brush.x(x_scale).y(y_scale));
 
     function brushstart(p) {
-	svg2.classed("selecting", true);
+	scatter.classed("selecting", true);
 	if (brush.data !== p) {
-	    svg2.call(brush.clear());
+	    scatter.call(brush.clear());
 	    brush.x(p.x).y(p.y).data = p;
 	}
     }
 
     function brushend(p) {
-	svg2.classed("selecting", false);
-	svg2.call(brush.clear());
+	scatter.classed("selecting", false);
+	scatter.call(brush.clear());
     }
 
     function brush(p) {
 	var e = brush.extent();
-	svg2.selectAll("circle").attr("class", function(d) {
-	    return e[0][0] <= d['log_density'] && d['log_density'] <= e[1][0]
-		&& e[0][1] <= d['dem%'] && d['dem%'] <= e[1][1]
-		? "selected" : null;
+	var selected = {};
+	scatter.selectAll(".datapoint").classed("selected", function(d) {
+	    var sel =  e[0][0] <= d['log_density'] && d['log_density'] <= e[1][0] && e[0][1] <= d['dem%'] && d['dem%'] <= e[1][1];
+	    selected[d['id']] = sel;
+	    return sel;
+	});
+	map.selectAll(".datapoint").classed("selected", function(d) {
+	    return selected[d['id']];
 	});
     }
 }
