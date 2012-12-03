@@ -1,4 +1,3 @@
-
 var width = 960,
 height = 500;
 s_size = 500;
@@ -17,13 +16,11 @@ var map = svg.append("g")
     .attr("class", "map");
 
 var scatter = svg.append("g")
-//    .attr("width", s_size)
-//    .attr("height", s_size)
     .attr("transform", "translate(0,500)")
     .attr("class", "scatter");
 
 queue()
-    .defer(d3.json, "data/us-counties.json")
+    .defer(d3.json, "data/us-counties-plus.json")
     .defer(d3.json, "data/us-states.json")
     .defer(d3.json, "data/election-data.json")
     .await(ready);
@@ -36,8 +33,9 @@ function ready(error, counties, states, election) {
 	.data(counties.features)
 	.enter().append("path")
 	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
-	.attr("d", path);
-
+	.attr("d", path)
+	.attr("cx", function(d) { return d['xCenter'];})
+	.attr("cy", function(d) { return d['yCenter'];});
 
     map.append("path")
 	.datum(states)
@@ -46,16 +44,15 @@ function ready(error, counties, states, election) {
 
     // scatter
 
-    var make_scale = function(prop,range_min,range_max) {
-	return d3.scale.linear().domain([d3.min(election, function(c) { return c[prop]; }),
-					 d3.max(election, function(c) { return c[prop]; })])
+    var make_scale = function(values, prop,range_min,range_max) {
+	return d3.scale.linear().domain([d3.min(values, function(c) { return c[prop]; }),
+					 d3.max(values, function(c) { return c[prop]; })])
             .range([range_min,range_max]);
     }
 
-    x_scale = make_scale('log_density', 10, s_size - 10);
-    y_scale = make_scale('dem%', 10, s_size - 10);
-    population_scale = make_scale('population', 4, 900); // square of radius
-
+    x_scale = make_scale(election, 'log_density', 10, s_size - 10);
+    y_scale = make_scale(election, 'dem%', 10, s_size - 10);
+    population_scale = make_scale(election, 'population', 4, 900); // square of radius
 
     scatter.selectAll("circle")
         .data(election)
@@ -73,8 +70,8 @@ function ready(error, counties, states, election) {
 	.on("brushend", brushend);
 
     scatter.append("g")
-      .attr("class", "brush")
-      .call(brush.x(x_scale).y(y_scale));
+	.attr("class", "brush")
+	.call(brush.x(x_scale).y(y_scale));
 
     function brushstart(p) {
 	scatter.classed("selecting", true);
@@ -98,6 +95,46 @@ function ready(error, counties, states, election) {
 	    return sel;
 	});
 	map.selectAll(".datapoint").classed("selected", function(d) {
+	    return selected[d['id']];
+	});
+    }
+
+    // other brush
+
+    var brush2 = d3.svg.brush()
+	.on("brushstart", brushstart2)
+	.on("brush", brush2)
+	.on("brushend", brushend2);
+
+    var mx_scale = make_scale(counties.features, 'xCenter', 10, s_size - 10);
+    var my_scale = make_scale(counties.features, 'yCenter', 10, s_size - 10);
+
+    map.append("g")
+	.attr("class", "brush")
+	.call(brush2.x(mx_scale).y(my_scale)); // +++ d3.scale.linear().domain([0,500]).range([0,500])
+    
+    function brushstart2(p) {
+	map.classed("selecting", true); // +++
+	if (brush2.data !== p) {
+	    map.call(brush2.clear());
+	    brush2.x(p.x).y(p.y).data = p; // +++?
+	}
+    }
+
+    function brushend2(p) {
+	map.classed("selecting", false);
+	map.call(brush2.clear());
+    }
+
+    function brush2(p) {
+	var e = brush2.extent();
+	var selected = {};
+	map.selectAll(".datapoint").classed("selected", function(d) {
+	    var sel =  e[0][0] <= d['xCenter'] && d['xCenter'] <= e[1][0] && e[0][1] <= d['yCenter'] && d['yCenter'] <= e[1][1];
+	    selected[d['id']] = sel;
+	    return sel;
+	});
+	scatter.selectAll(".datapoint").classed("selected", function(d) {
 	    return selected[d['id']];
 	});
     }
