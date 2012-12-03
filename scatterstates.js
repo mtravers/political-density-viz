@@ -33,9 +33,7 @@ function ready(error, counties, states, election) {
 	.data(counties.features)
 	.enter().append("path")
 	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
-	.attr("d", path)
-	.attr("cx", function(d) { return d['xCenter'];})
-	.attr("cy", function(d) { return d['yCenter'];});
+	.attr("d", path);
 
     map.append("path")
 	.datum(states)
@@ -44,9 +42,10 @@ function ready(error, counties, states, election) {
 
     // scatter
 
-    var make_scale = function(values, prop,range_min,range_max) {
-	return d3.scale.linear().domain([d3.min(values, function(c) { return c[prop]; }),
-					 d3.max(values, function(c) { return c[prop]; })])
+    var make_scale = function(values, prop, range_min, range_max) {
+	return d3.scale.linear()
+	    .domain([d3.min(values, function(c) { return c[prop]; }),
+		     d3.max(values, function(c) { return c[prop]; })])
             .range([range_min,range_max]);
     }
 
@@ -106,18 +105,18 @@ function ready(error, counties, states, election) {
 	.on("brush", brush2)
 	.on("brushend", brushend2);
 
-    var mx_scale = make_scale(counties.features, 'xCenter', 10, s_size - 10);
-    var my_scale = make_scale(counties.features, 'yCenter', 10, s_size - 10);
+    var mx_scale = d3.scale.linear().domain([0,1000]).range([0,1000]);
+    var my_scale = d3.scale.linear().domain([0,1000]).range([0,1000]);
 
     map.append("g")
 	.attr("class", "brush")
-	.call(brush2.x(mx_scale).y(my_scale)); // +++ d3.scale.linear().domain([0,500]).range([0,500])
+	.call(brush2.x(mx_scale).y(my_scale)); 
     
     function brushstart2(p) {
-	map.classed("selecting", true); // +++
+	map.classed("selecting", true); 
 	if (brush2.data !== p) {
 	    map.call(brush2.clear());
-	    brush2.x(p.x).y(p.y).data = p; // +++?
+	    brush2.x(p.x).y(p.y).data = p; 
 	}
     }
 
@@ -130,7 +129,9 @@ function ready(error, counties, states, election) {
 	var e = brush2.extent();
 	var selected = {};
 	map.selectAll(".datapoint").classed("selected", function(d) {
-	    var sel =  e[0][0] <= d['xCenter'] && d['xCenter'] <= e[1][0] && e[0][1] <= d['yCenter'] && d['yCenter'] <= e[1][1];
+//	    var sel =  e[0][0] <= d['xCenter'] && d['xCenter'] <= e[1][0] && e[0][1] <= d['yCenter'] && d['yCenter'] <= e[1][1];
+	    centroid = path.centroid(d);
+	    var sel =  e[0][0] <= centroid[0] && centroid[0] <= e[1][0] && e[0][1] <= centroid[1] && centroid[1] <= e[1][1];
 	    selected[d['id']] = sel;
 	    return sel;
 	});
