@@ -1,6 +1,7 @@
-var width = 960,
-height = 500;
-s_size = 500;
+var s_size = 500;
+var m_size = 1000;
+var width = s_size + m_size;
+var height = 500;
 
 var quantize = d3.scale.quantize()
     .domain([0, 100])
@@ -10,14 +11,14 @@ var path = d3.geo.path();
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
-    .attr("height", height + s_size)
-
-var map = svg.append("g")
-    .attr("class", "map");
+    .attr("height", height + s_size);
 
 var scatter = svg.append("g")
-    .attr("transform", "translate(0,500)")
     .attr("class", "scatter");
+
+var map = svg.append("g")
+    .attr("transform", "translate(500,0)")
+    .attr("class", "map");
 
 queue()
     .defer(d3.json, "data/us-counties-plus.json")
@@ -47,16 +48,18 @@ function ready(error, counties, states, election) {
 	    .domain([d3.min(values, function(c) { return c[prop]; }),
 		     d3.max(values, function(c) { return c[prop]; })])
             .range([range_min,range_max]);
-    }
+    };
 
-    x_scale = make_scale(election, 'log_density', 10, s_size - 10);
-    y_scale = make_scale(election, 'dem%', 10, s_size - 10);
-    population_scale = make_scale(election, 'population', 4, 900); // square of radius
+    var x_scale = make_scale(election, 'log_density', 10, s_size - 10);
+    var y_scale = make_scale(election, 'dem%', 10, s_size - 10);
+    var population_scale = make_scale(election, 'population', 4, 900); // square of radius
 
     scatter.selectAll("circle")
         .data(election)
         .enter().append("svg:circle")
-        .attr("class", "datapoint")
+// bands look crappy -- how about a side scale?
+//	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
+	.attr("class", "datapoint")
         .attr("cx", function(d) { return x_scale(d['log_density']); })
         .attr("cy", function(d) { return y_scale(d['dem%']); })
         .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
@@ -74,6 +77,7 @@ function ready(error, counties, states, election) {
 
     function brushstart(p) {
 	scatter.classed("selecting", true);
+	map.classed("selecting", true);
 	if (brush.data !== p) {
 	    scatter.call(brush.clear());
 	    brush.x(p.x).y(p.y).data = p;
@@ -81,7 +85,7 @@ function ready(error, counties, states, election) {
     }
 
     function brushend(p) {
-	scatter.classed("selecting", false);
+//	scatter.classed("selecting", false);
 	scatter.call(brush.clear());
     }
 
@@ -114,6 +118,7 @@ function ready(error, counties, states, election) {
     
     function brushstart2(p) {
 	map.classed("selecting", true); 
+	scatter.classed("selecting", true); 
 	if (brush2.data !== p) {
 	    map.call(brush2.clear());
 	    brush2.x(p.x).y(p.y).data = p; 
@@ -121,7 +126,7 @@ function ready(error, counties, states, election) {
     }
 
     function brushend2(p) {
-	map.classed("selecting", false);
+//	map.classed("selecting", false);
 	map.call(brush2.clear());
     }
 
@@ -129,8 +134,7 @@ function ready(error, counties, states, election) {
 	var e = brush2.extent();
 	var selected = {};
 	map.selectAll(".datapoint").classed("selected", function(d) {
-//	    var sel =  e[0][0] <= d['xCenter'] && d['xCenter'] <= e[1][0] && e[0][1] <= d['yCenter'] && d['yCenter'] <= e[1][1];
-	    centroid = path.centroid(d);
+	    var centroid = path.centroid(d);
 	    var sel =  e[0][0] <= centroid[0] && centroid[0] <= e[1][0] && e[0][1] <= centroid[1] && centroid[1] <= e[1][1];
 	    selected[d['id']] = sel;
 	    return sel;

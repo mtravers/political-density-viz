@@ -9,10 +9,10 @@
 
 
 (setq *x-states
-      (mql-assoc :features (json:decode-json-from-source #P"/misc/working/election/us-states.json")))
+      (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-states.json")))
 
 (defun +get (prop tuple)
-  (mql-assoc prop tuple))
+  (mql-assocdr prop tuple))
 
 (defun +put (prop tuple value)
   (mt:aif (find prop tuple :key #'car :test #'mql-prop-eql)
@@ -33,7 +33,7 @@
 (mapcar #'compute-center *x-counties)
 
 (setq *x-counties
-      (mql-assoc :features (json:decode-json-from-source #P"/misc/working/election/us-counties.json")))
+      (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-counties.json")))
 
 (defun state-counties (state-name)
   (let ((c (find state-name *by-county-electoral-results* :key #'car :test #'equal)))
@@ -46,7 +46,6 @@
 						    prospective-county-name))
 					 (state-counties (+get :name (+get :properties +state)))))
 			       *x-states)))
-    (pprint candidates)
     (case (length candidates)
       (1 (car candidates))
       (0 (error "No county matched ~A" +county))
@@ -58,3 +57,17 @@
 (defun distance (a b)
   (sqrt (+ (expt (- (+get :x-center a)(+get :x-center b)) 2)
 	   (expt (- (+get :y-center a)(+get :y-center b)) 2))))
+
+
+(mapc #'(lambda (+county)
+	  (mt:report-and-ignore-errors 
+	    (let ((state (find-state +county)))
+	      (+put :state +county (+get :name (+get :properties state))))))
+      *x-counties)
+
+
+(with-open-file (s "/misc/working/election/data/us-counties-plus.json" :direction :output :if-exists :supersede)
+  ;; +++ haven't tested this but som ekind of wrapping is necessary
+  (json:encode-json `(("type" . "FeatureCollection") 
+		      ("features" . ,*x-counties))
+		    s))

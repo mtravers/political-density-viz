@@ -6283,4 +6283,9 @@
    ("Teton" (("Dem" 6211) ("GOP" 4858) ("Lib" 272) ("CST" 15)))
    ("Uinta" (("GOP" 6613) ("Dem" 1628) ("Lib" 166) ("CST" 46)))
    ("Washakie" (("GOP" 3013) ("Dem" 794) ("Lib" 74) ("CST" 30)))
-   ("Weston" (("GOP" 2821) ("Dem" 422) ("Lib" 52) ("CST" 28)))))))
+   ("Weston" (("GOP" 2821) ("Dem" 422) ("Lib" 52) ("CST" 28)))))
+   ;; by hand
+   ("District of Columbia"
+    (("District of Columbia" (("GOP" 17337) ("Dem" 222332)))))
+   ))
+

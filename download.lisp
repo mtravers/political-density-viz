@@ -51,6 +51,7 @@
 	 (counties (html-find-elements div (tag-selector :tbody))))
     counties))
     
+#|
 ;;; Input something like
 ((:TBODY :ID "county1001")
   ((:TR :CLASS "party-republican race-winner")
@@ -66,6 +67,7 @@
    ((:TD :CLASS "results-percentage") "26.6%")
    ((:TD :CLASS "results-popular") "     6,354"))
  ... third parties)
+|#
 
 (defun tag-selector (tag)
    #'(lambda (elt)
@@ -92,7 +94,7 @@
 						  (html-find-element result-row (class-selector "results-party"))))))
 		       (list party popular)))
 		 ;; result rows
-		 (html-find-elements county-html (tag-equals-selector :tr)))))
+		 (html-find-elements county-html (tag-selector :tr)))))
     (list county results)))
   
 	 
@@ -146,12 +148,8 @@
     "Washington"
     "West Virginia"
     "Wisconsin"
-    "Wyoming"))	 
-    
-
-       
-    
-
+    "Wyoming"
+    "Puerto Rico"))	 
 
 
 (mapcar #'(lambda (s) 
@@ -191,20 +189,21 @@
 
 
 (defun add-region-code (+county)
-  (lookup-geo-county (+get :state +county) (+get :county +county)))
+  (+put :id +county (+get :id (lookup-geo-county (+get :state +county) (+get :county +county)))))
+
+(length (mapc #'add-region-code *weave*))
 
     
 (defun lookup-geo-county (state county)
   (some #'(lambda (c) (and (equal state (+get :state c)) (equal county (+get :name (+get :properties c))) c))
-	*x-counties	))
-
+	*x-counties))
 
 (defun lookup-m-county (state county)
   (find county (cadr (find state *m-county-info* :key #'car :test #'equal))
 	:key #'car :test #'equal))
 	
 (length (setq *weave* (weave)))
-(with-open-file (s "/misc/working/election/data.json" :direction :output :if-exists :supersede)
+(with-open-file (s "/misc/working/election/data/data.json" :direction :output :if-exists :supersede)
   (json:encode-json *weave* s))
 
 

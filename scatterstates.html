@@ -15,15 +15,15 @@
 }
 
 .map {fill:rgb(200,255,200)}
-.map .q8 {fill:rgb(178, 24, 43)}
-.map .q7 {fill:rgb(214, 96, 77)}
-.map .q6 {fill:rgb(244, 165, 130)}
-.map .q5 {fill:rgb(253, 219, 199)}
-.map .q4 {fill:rgb(247, 247, 247)}
-.map .q3 {fill:rgb(209, 229, 240)}
-.map .q2 {fill:rgb(146, 197, 222)}
-.map .q1 {fill:rgb(67, 147, 195)}
-.map .q0 {fill:rgb(33, 102, 172)}
+.q8 {fill:rgb(178, 24, 43)}
+.q7 {fill:rgb(214, 96, 77)}
+.q6 {fill:rgb(244, 165, 130)}
+.q5 {fill:rgb(253, 219, 199)}
+.q4 {fill:rgb(247, 247, 247)}
+.q3 {fill:rgb(209, 229, 240)}
+.q2 {fill:rgb(146, 197, 222)}
+.q1 {fill:rgb(67, 147, 195)}
+.q0 {fill:rgb(33, 102, 172)}
 
 circle {
    fill:#333;
@@ -34,16 +34,22 @@ circle {
   stroke: #f00;
 }
 
-.selecting circle {
+.selecting {
+  fill-opacity: .2;
+}
+
+.selecting > circle {
   fill-opacity: .2;
 }
 
 circle.selected {
-  stroke: #f00;
+  fill:rgb(0,100,0);
+  fill-opacity: .8;
 }
 
 path.selected {
-  stroke: #000;
+  stroke: #888;
+  fill-opacity: 1;
 }
 
 .brush .extent {
