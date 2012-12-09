@@ -206,6 +206,15 @@
 (with-open-file (s "/misc/working/election/data/election-data.json" :direction :output :if-exists :supersede)
   (json:encode-json *weave* s))
 
+;;; Fixup
+(with-open-file (i "/misc/working/election/data/election-data.json" )
+  (with-open-file (o "/misc/working/election/data/election-data-fixed.json" :direction :output :if-exists :supersede)
+    (setq *weave* (json:decode-json i))
+    (mapc #'(lambda (ent)
+	      (setf (mql-assocdr :id ent)
+		    (mt:report-and-ignore-errors (parse-integer (mql-assocdr :id ent)))))
+	  *weave*)
+	  (json:encode-json *weave* o))))
 
 (defmacro blank-on-error (exp)
   `(or (ignore-errors ,exp)

@@ -11,7 +11,7 @@ var path = d3.geo.path();
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
-    .attr("height", height + s_size);
+    .attr("height", height);
 
 var scatter = svg.append("g")
     .attr("class", "scatter");
@@ -24,6 +24,8 @@ queue()
     .defer(d3.json, "data/us-new.json")
     .defer(d3.json, "data/election-data-fixed.json")
     .await(ready);
+
+var clearSelection;
 
 function ready(error, us, election) {
     var rateById = {};
@@ -74,6 +76,14 @@ function ready(error, us, election) {
     scatter.append("g")
 	.attr("class", "brush")
 	.call(brush.x(x_scale).y(y_scale));
+
+    // not quite
+    clearSelection = function() {
+	scatter.call(brush.clear());
+	map.call(brush2.clear());
+	scatter.classed("selecting", false);
+	map.classed("selecting", false);
+    };
 
     function brushstart(p) {
 	scatter.classed("selecting", true);
