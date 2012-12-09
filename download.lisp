@@ -203,7 +203,7 @@
 	:key #'car :test #'equal))
 	
 (length (setq *weave* (weave)))
-(with-open-file (s "/misc/working/election/data/data.json" :direction :output :if-exists :supersede)
+(with-open-file (s "/misc/working/election/data/election-data.json" :direction :output :if-exists :supersede)
   (json:encode-json *weave* s))
 
 

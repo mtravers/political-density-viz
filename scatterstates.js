@@ -21,23 +21,23 @@ var map = svg.append("g")
     .attr("class", "map");
 
 queue()
-    .defer(d3.json, "data/us-counties-plus.json")
-    .defer(d3.json, "data/us-states.json")
-    .defer(d3.json, "data/election-data.json")
+    .defer(d3.json, "data/us-new.json")
+    .defer(d3.json, "data/election-data-fixed.json")
     .await(ready);
 
-function ready(error, counties, states, election) {
+function ready(error, us, election) {
     var rateById = {};
     election.forEach(function (c) { rateById[c.id] = +c['dem%'];});
     map
 	.selectAll("path")
-	.data(counties.features)
+	.data(topojson.object(us, us.objects.counties).geometries)
 	.enter().append("path")
 	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
+//	.attr("class", function(d) { return "datapoint " + quantize(100 * Math.random());})
 	.attr("d", path);
 
     map.append("path")
-	.datum(states)
+	.datum(topojson.mesh(us, us.objects.states), function(a, b) { return a.id !== b.id; })
 	.attr("class", "states")
 	.attr("d", path);
 
