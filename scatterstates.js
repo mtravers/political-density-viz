@@ -35,7 +35,6 @@ function ready(error, us, election) {
 	.data(topojson.object(us, us.objects.counties).geometries)
 	.enter().append("path")
 	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
-//	.attr("class", function(d) { return "datapoint " + quantize(100 * Math.random());})
 	.attr("d", path);
 
     map.append("path")

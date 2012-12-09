@@ -8,8 +8,13 @@
 |#
 
 
-(setq *x-states
+(defvar *x-states
       (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-states.json")))
+
+;;; List of ((:TYPE . "Feature") (:ID . "01001") (:PROPERTIES (:NAME . "Autauga")) (:GEOMETRY (:TYPE . "Polygon") (:COORDINATES ((-86.41178 32.70634) (-86.41178 32.410587) (-86.49941 32.344864) (-86.81708 32.33939) (-86.915665 32.662525) (-86.41178 32.70634)))))
+(defvar *x-counties
+  (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-counties.json")))
+
 
 (defun +get (prop tuple)
   (mql-assocdr prop tuple))
@@ -28,12 +33,9 @@
     (+put :x-center +state (mt:average (mapcar #'car coordinates)))
     (+put :y-center +state (mt:average (mapcar #'cadr coordinates)))))
 	   
-(mapcar #'compute-center *x-states)
+(length (mapcar #'compute-center *x-states))
 
-(mapcar #'compute-center *x-counties)
-
-(setq *x-counties
-      (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-counties.json")))
+(length (mapcar #'compute-center *x-counties))
 
 (defun state-counties (state-name)
   (let ((c (find state-name *by-county-electoral-results* :key #'car :test #'equal)))

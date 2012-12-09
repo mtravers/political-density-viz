@@ -1,10 +1,17 @@
 Three data sets:
 - state/county shates: us-counties.json, us-state.json (off d3 site). Has county codes
+  Changed, now just us-new.json, combines both sets.
+
 - county Pop/Area (from Freebase)
-- electoral results (scraped from politico? and now in big.lisp)
+  in county-info
+
+- electoral results (scraped from politico? )
+  scraped-election-results.lisp
 
 Put together:
 - data/data.json 
+
+
 
 
 

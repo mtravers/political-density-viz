@@ -1,45 +1,11 @@
 (ql:quickload '(:drakma :cl-json :wuwei :cl-html-parse))
 
+;;; Retrieve electoral data
 
 #|
 (net.html.parser:parse-html
  (drakma:http-request "http://www.politico.com/2012-election/results/president/alabama/"))
 |#
-
-(defun html-find-elements (from pred)
-  (mt:collecting 
-    (labels ((html-select-elements-1 (from)
-	       (if (funcall pred from)
-		   (mt:collect from)
-		   (mapc #'html-select-elements-1 (html-subelements from)))))
-      (html-select-elements-1 from))))
-
-(defun html-find-element (from pred)
-  (labels ((html-find-element-1 (from)
-	     (if (funcall pred from)
-		 (return-from html-find-element from)
-		 (mapc #'html-find-element-1 (html-subelements from)))))
-    (html-find-element-1 from)))
-
-(defun html-subelements (elt)
-  (and (listp elt)
-       (cdr elt)))
-
-(defun html-tag (elt)
-  (cond ((listp elt)
-	 (if (listp (car elt))
-	     (caar elt)
-	     (car elt)))
-	((keywordp elt) elt)
-	(t nil)))
-
-(defun html-attribute (elt att)
-  (and (listp elt)
-       (listp (car elt))
-       (cadr (member att (car elt)))))
-
-(defun html-class? (elt class)
-  (search class (or (html-attribute elt :class) "")))
 
 (defun retrieve-state (state)
   (net.html.parser:parse-html
@@ -52,7 +18,7 @@
     counties))
     
 #|
-;;; Input something like
+;;; Results in something like:
 ((:TBODY :ID "county1001")
   ((:TR :CLASS "party-republican race-winner")
    ((:TH :ROWSPAN "5" :CLASS "results-county") "Autauga "
@@ -69,23 +35,11 @@
  ... third parties)
 |#
 
-(defun tag-selector (tag)
-   #'(lambda (elt)
-       (eq tag (html-tag elt))))
-
-(defun class-selector (class)
-   #'(lambda (elt)
-       (html-class? elt class)))
-
-(defun html-contents (elt)
-  (cond ((stringp elt) elt)
-	(t (cadr elt))))
-
 (defun parse-dumb-number (num-string)
   (parse-integer (mt:string-replace num-string "," "")))
 
 (defun parse-county (county-html)
-  (let ((county (html-contents (html-find-element county-html (class-selector "results-county"))))
+  (let ((county (mt:string-trim-whitespace  (html-contents (html-find-element county-html (class-selector "results-county")))))
 	(results
 	 (mapcar #'(lambda (result-row)
 		     (let ((popular (parse-dumb-number
@@ -96,7 +50,6 @@
 		 ;; result rows
 		 (html-find-elements county-html (tag-selector :tr)))))
     (list county results)))
-  
 	 
 (defvar *states*
   '("Alabama"
@@ -152,13 +105,15 @@
     "Puerto Rico"))	 
 
 
-(mapcar #'(lambda (s) 
+;;; produces state/county/electoral data structure
+(defvar *by-county-electoral-results*
+ (mapcar #'(lambda (s) 
 	    (list s
 		  (mt::report-and-ignore-errors 
 		    (mapcar #'parse-county 
 			    (parse-state 
 			     (retrieve-state s))))))
-	*states*)
+	*states*))
 
 
 ;;; Weave the two sets together
@@ -187,12 +142,10 @@
 	    (mt:collect county-fields)
 	    ))))))
 
-
 (defun add-region-code (+county)
   (+put :id +county (+get :id (lookup-geo-county (+get :state +county) (+get :county +county)))))
 
 (length (mapc #'add-region-code *weave*))
-
     
 (defun lookup-geo-county (state county)
   (some #'(lambda (c) (and (equal state (+get :state c)) (equal county (+get :name (+get :properties c))) c))
