@@ -66,7 +66,7 @@
  {"dem%":25.615162,"log_density":1.5972232,"county":"Wilcox","state":"Alabama","area":2349.1194,"population":11603,"Dem":4867,"GOP":1676,"Ind":2,"Ind":1,"Ind":1,"id":1131},
  {"dem%":86.59858,"log_density":2.7015908,"county":"Winston","state":"Alabama","area":1636.8726,"population":24395,"GOP":8310,"Dem":1286,"Ind":57,"Ind":34,"Ind":25,"id":1133},
 
- {"dem%":57.21182,"county":"Alaska","state":"Alaska","area":null,"population":null,"GOP":132974,"Dem":99450,"Lib":5974,"Grn":2307,"id":2068},
+ {"dem%":57.21182,"county":"Alaska","state":"Alaska","area":null,"population":null,"GOP":132974,"Dem":99450,"Lib":5974,"Grn":2307,"id":2000},
 
  {"dem%":32.487988,"log_density":0.9023968,"county":"Apache","state":"Arizona","area":29054.488,"population":71634,"Dem":17144,"GOP":8250,"Lib":354,"Grn":88,"id":4001},
  {"dem%":62.24136,"log_density":2.1014388,"county":"Cochise","state":"Arizona","area":16107.137,"population":131723,"GOP":26742,"Dem":16223,"Lib":635,"Grn":176,"id":4003},
