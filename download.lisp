@@ -51,6 +51,8 @@
 		 (html-find-elements county-html (tag-selector :tr)))))
     (list county results)))
 	 
+(defvar *all-counties* (mt:mapappend  #'cadr *by-county-electoral-results*))
+
 (defvar *states*
   '("Alabama"
     "Alaska"
@@ -104,22 +106,21 @@
     "Wyoming"
     "Puerto Rico"))	 
 
-
 ;;; produces state/county/electoral data structure
-(defvar *by-county-electoral-results*
+(defvar *by-state-electoral-results*
  (mapcar #'(lambda (s) 
-	    (list s
-		  (mt::report-and-ignore-errors 
-		    (mapcar #'parse-county 
-			    (parse-state 
-			     (retrieve-state s))))))
-	*states*))
+	     (list s
+		   (mt::report-and-ignore-errors 
+		     (mapcar #'parse-county 
+			     (parse-state 
+			      (retrieve-state s))))))
+	 *states*))
 
 
 ;;; Weave the two sets together
 (defun weave ()
   (mt:collecting
-    (dolist (e-state *by-county-electoral-results*)
+    (dolist (e-state *by-state-electoral-results*)
       (let ((state (car e-state)))
 	(dolist (e-county (cadr e-state))
 	  (let* ((county (car e-county))
@@ -168,6 +169,18 @@
 		    (mt:report-and-ignore-errors (parse-integer (mql-assocdr :id ent)))))
 	  *weave*)
 	  (json:encode-json *weave* o))))
+
+;;; More fixup
+
+(length
+ (setq *election-fixed*
+       (with-open-file (i "/misc/working/election/data/election-data-fixed.json")
+	 (json:decode-json i))))
+
+
+(length
+ (setq *dupes*
+       (mt:filter #'(lambda (x) (> (length x) 1)) (mt:group *election-fixed :key (json-accessor :id)))))
 
 (defmacro blank-on-error (exp)
   `(or (ignore-errors ,exp)

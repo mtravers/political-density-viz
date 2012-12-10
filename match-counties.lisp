@@ -48,6 +48,7 @@
 						    prospective-county-name))
 					 (state-counties (+get :name (+get :properties +state)))))
 			       *x-states)))
+    (setq *x candidates)
     (case (length candidates)
       (1 (car candidates))
       (0 (error "No county matched ~A" +county))
