@@ -177,10 +177,16 @@
        (with-open-file (i "/misc/working/election/data/election-data-fixed.json")
 	 (json:decode-json i))))
 
-
 (length
  (setq *dupes*
-       (mt:filter #'(lambda (x) (> (length x) 1)) (mt:group *election-fixed :key (json-accessor :id)))))
+       (mt:filter #'(lambda (x) (> (length x) 1)) (mt:group *election-fixed* :key (json-accessor :id)))))
+
+;;; And more
+
+(length
+ (setq *new*
+       (with-open-file (i "/misc/working/election/data/us-new.json")
+	 (json:decode-json i))))
 
 (defmacro blank-on-error (exp)
   `(or (ignore-errors ,exp)
