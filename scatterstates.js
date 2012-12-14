@@ -51,8 +51,8 @@ function ready(error, us, election) {
             .range([range_min,range_max]);
     };
 
-    var x_scale = make_scale(election, 'log_density', 10, s_size - 10);
-    var y_scale = make_scale(election, 'dem%', 10, s_size - 10);
+    var x_scale = make_scale(election, 'log_density', 0, s_size);
+    var y_scale = make_scale(election, 'dem%', 0, s_size);
     var population_scale = make_scale(election, 'population', 4, 900); // square of radius
 
     scatter.selectAll("circle")
@@ -61,9 +61,9 @@ function ready(error, us, election) {
 // bands look crappy -- how about a side scale?
 //	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
 	.attr("class", "datapoint")
+        .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
         .attr("cx", function(d) { return x_scale(d['log_density']); })
         .attr("cy", function(d) { return y_scale(d['dem%']); })
-        .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
         .append("svg:title").text(function(d) { return d['county'] + ", " + d['state']; });
 
     // Brush.

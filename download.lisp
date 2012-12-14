@@ -134,7 +134,7 @@
 	    ;; easier to do that here than in js, sorry
 	    (ignore-errors 
 	      (push (cons :log_density (log (/ (mql-assocdr :population county-fields)
-					     (mql-assocdr :area county-fields)))) county-fields))
+					       (mql-assocdr :area county-fields)))) county-fields))
 	    (ignore-errors 
 	      (push (cons :dem% (float (* 100 (/ (mql-assocdr "GOP" county-fields)
 						 (+ (mql-assocdr "GOP" county-fields)
@@ -201,7 +201,31 @@
 	 (read i))))
 
 
+;;; Oh fuck me.
+
+(multiple-value-setq (*unbroken-no-id* *unbroken-id*)
+  (mt:split-list #'(lambda (x) (null (mql-assocdr :id x))) *unbroken*))
+
 ;;; weave unbroken back in.
+(dolist (u *unbroken*)
+  (let* ((id (mql-assocdr :id u))
+	 (orig (find id *election-fixed* :key (json-accessor :id))))
+    (dolist (elt u)
+      (mt:aif (assoc (car elt) orig)
+	   (setf (cdr mt:it) (cdr elt))
+	   (mt:push-end elt orig)))))
+
+
+(dolist (u *election-fixed*)
+  (unless (assoc :log_density u)
+    (mt:report-and-ignore-errors
+      (mt:push-end
+       (cons :log_density (log (/ (mql-assocdr :population u)
+				  (mql-assocdr :area u))))
+       u))))
+
+(with-open-file (o "/misc/working/election/data/election-data-more-fixed.json" :direction :output :if-exists :supersede)
+  (json:encode-json *election-fixed* o))
 
 
 (defmacro blank-on-error (exp)
