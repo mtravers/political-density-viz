@@ -1,3 +1,4 @@
+(ql:quickload :cl-mql)
 
 (defun uncounty (s)
   (if (search "County" s)
@@ -23,9 +24,9 @@
   (let ((raw (state-counties-raw-mql state)))
     (print `(,(length raw) counties in ,state))
     (mapcar #'(lambda (raw-c)
-		`(,(uncounty (mql-assocdr :name raw-c))
+		`(,(uncounty (mql-assocdr "name" raw-c))
 		   ,(mql-assocdr "/location/location/area" raw-c)
-		   ,(mql-assocdr :number (car (mql-assocdr "/location/statistical_region/population" raw-c)))))
+		   ,(mql-assocdr "number" (car (mql-assocdr "/location/statistical_region/population" raw-c)))))
 	    raw)))
 
 (defun mql-get-all ()

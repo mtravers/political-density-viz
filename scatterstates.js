@@ -22,7 +22,7 @@ var map = svg.append("g")
 
 queue()
     .defer(d3.json, "data/us-new.json")
-    .defer(d3.json, "data/election-data-fixed.json")
+    .defer(d3.json, "data/election-data-more-fixed.json")
     .await(ready);
 
 var clearSelection;

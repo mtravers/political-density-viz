@@ -188,6 +188,22 @@
        (with-open-file (i "/misc/working/election/data/us-new.json")
 	 (json:decode-json i))))
 
+;;; More!
+
+(length
+ (setq *broken* 
+       (mt:filter #'(lambda (ent) (or (null (mql-assocdr :population ent))(null (mql-assocdr :dem% ent))))
+		  *election-fixed*)))
+
+(length
+ (setq *unbroken* 
+       (with-open-file (i "/misc/working/election/data/unbroken.lisp")
+	 (read i))))
+
+
+;;; weave unbroken back in.
+
+
 (defmacro blank-on-error (exp)
   `(or (ignore-errors ,exp)
        ""))
