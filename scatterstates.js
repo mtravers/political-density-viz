@@ -1,7 +1,10 @@
-var s_size = 500;
+var s_margin = {top: 20, right: 20, bottom: 30, left: 40},
+    s_width = 600 - s_margin.left - s_margin.right,
+    s_height = 550 - s_margin.top - s_margin.bottom;
+
 var m_size = 1000;
-var width = s_size + m_size;
-var height = 500;
+var t_width = s_width + m_size;
+var t_height = 550;
 
 var quantize = d3.scale.quantize()
     .domain([0, 100])
@@ -10,14 +13,14 @@ var quantize = d3.scale.quantize()
 var path = d3.geo.path();
 
 var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", t_width)
+    .attr("height", t_height);
 
 var scatter = svg.append("g")
     .attr("class", "scatter");
 
 var map = svg.append("g")
-    .attr("transform", "translate(500,0)")
+    .attr("transform", "translate(600,0)")
     .attr("class", "map");
 
 queue()
@@ -51,20 +54,52 @@ function ready(error, us, election) {
             .range([range_min,range_max]);
     };
 
-    var x_scale = make_scale(election, 'log_density', 0, s_size);
-    var y_scale = make_scale(election, 'dem%', 0, s_size);
+    var x_scale = make_scale(election, 'log_density', s_margin.left, s_margin.left + s_width);
+    var y_scale = make_scale(election, 'dem%', s_margin.top + s_height, s_margin.top);
     var population_scale = make_scale(election, 'population', 4, 900); // square of radius
 
     scatter.selectAll("circle")
         .data(election)
         .enter().append("svg:circle")
 // bands look crappy -- how about a side scale?
-//	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
-	.attr("class", "datapoint")
+	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
+//	.attr("class", "datapoint")
         .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
         .attr("cx", function(d) { return x_scale(d['log_density']); })
         .attr("cy", function(d) { return y_scale(d['dem%']); })
         .append("svg:title").text(function(d) { return d['county'] + ", " + d['state']; });
+
+    var yAxis = d3.svg.axis()
+	    .scale(y_scale)
+	    .orient("left");
+
+    var xAxis = d3.svg.axis()
+	    .scale(x_scale)
+	    .orient("bottom");    
+
+    // y axis
+    scatter.append("g")
+      .attr("class", "y axis")
+	.attr("transform", "translate(" + s_margin.left + ",0)")
+	.call(yAxis)
+	.append("text")
+	.attr("class", "label")
+	.attr("transform", "rotate(-90)")
+	.attr("y", 6)
+	.attr("dy", ".71em")
+	.style("text-anchor", "end")
+	.text("% Democratic");
+
+    scatter.append("g")
+	.attr("class", "x axis")
+	.attr("transform", "translate(0," + (s_height + s_margin.top) + ")")
+	.call(xAxis)
+	.append("text")
+	.attr("class", "label")
+	.attr("x", s_width)
+	.attr("y", -6)
+	.style("text-anchor", "end")
+	.text("log(density)");
 
     // Brush.
     var brush = d3.svg.brush()
