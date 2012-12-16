@@ -237,6 +237,12 @@
     (mt:report-and-ignore-errors
       (mt:push-end (cons  :log--density (float (log (/ (mt:assocdr :population u) (mt:assocdr :area u))))) u))))
 
+
+(dolist (u *election-fixed*)
+  (unless (mt:assocdr :log--density u)
+    (print u)
+    ))
+
 (with-open-file (o "/misc/working/election/data/election-data-more-fixed.json" :direction :output :if-exists :supersede)
   (json:encode-json *election-fixed* o))
 

@@ -1,3 +1,13 @@
+For release:
+- final data cleaning
+- fix brushing
+- legend
+- Better fonts, css
+- credits, explanation, apology
+
+- x-axis -- should scale with d3, I’m sure there is a log scale
+
+
 Three data sets:
 - state/county shates: us-counties.json, us-state.json (off d3 site). Has county codes
   Changed, now just us-new.json, combines both sets.
@@ -10,10 +20,6 @@ Three data sets:
 
 Put together:
 - data/data.json 
-
-
-
-
 
 Todo
 
@@ -30,7 +36,7 @@ V1
 - brushing
 
 V2
-- changeable vars.
+- changeable vars (unemployment from freebase, etc)
 
 
 
