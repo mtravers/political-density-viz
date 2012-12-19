@@ -215,6 +215,20 @@
 	   (setf (cdr mt:it) (cdr elt))
 	   (mt:push-end elt orig)))))
 
+;;; Again but better
+(dolist (u *unbroken*)
+  (print u)
+  (mt:report-and-ignore-errors
+  (let* ((id (mql-assocdr :id u))
+	 (orig (find id *election-fixed* :key (json-accessor :id)))
+	 (area (cdr (assoc :area u)))
+	 (population (cdr (assoc :population u))))
+    (setf (cdr (assoc :area orig)) area)
+    (setf (cdr (assoc :population orig)) population)
+    (mt:push-end (cons :log_density
+		       (log (/ population area)))
+		 orig))))
+
 
 (dolist (u *election-fixed*)
   (unless (assoc :log_density u)
@@ -238,12 +252,11 @@
       (mt:push-end (cons  :log--density (float (log (/ (mt:assocdr :population u) (mt:assocdr :area u))))) u))))
 
 
-(dolist (u *election-fixed*)
-  (unless (mt:assocdr :log--density u)
-    (print u)
-    ))
+(length
+ (setq *fuckme*
+       (mt:filter #'null *election-fixed* :key (json-accessor :log--density))))
 
-(with-open-file (o "/misc/working/election/data/election-data-more-fixed.json" :direction :output :if-exists :supersede)
+(with-open-file (o "/misc/working/election/public/data/election-data-more-fixed.json" :direction :output :if-exists :supersede)
   (json:encode-json *election-fixed* o))
 
 

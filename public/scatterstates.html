@@ -48,12 +48,14 @@ circle {
 }
 
 circle.selected {
-  fill:rgb(0,100,0);
+  stroke:rgb(0,100,0);
+  stroke-width: 1px;
   fill-opacity: .8;
 }
 
 path.selected {
-  stroke: #888;
+  stroke:rgb(0,100,0);
+  stroke-width: 1px;
   fill-opacity: 1;
 }
 
@@ -62,6 +64,11 @@ path.selected {
   fill-opacity: .125;
   shape-rendering: crispEdges;
 }
+
+.hidden {
+ display:none;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -79,7 +86,7 @@ path.selected {
 <script src="http://d3js.org/topojson.v0.min.js"></script>
 <script src="scatterstates.js"></script>
 <p>
- <a href="javascript:clearSelection();">Clear selection</a>
+<input id='brushing' type="checkbox" onclick="brushingClick()" checked=true>Brushing</a>
 </p>
 <p>
 This was created to serve an impulse to explore the (pretty obvious) observation that progressive politics is correlated with population density. <br/>

@@ -24,7 +24,7 @@
   (let ((raw (state-counties-raw-mql state)))
     (print `(,(length raw) counties in ,state))
     (mapcar #'(lambda (raw-c)
-		`(,(uncounty (mql-assocdr "name" raw-c))
+		`(,(identity (mql-assocdr "name" raw-c));uncounty
 		   ,(mql-assocdr "/location/location/area" raw-c)
 		   ,(mql-assocdr "number" (car (mql-assocdr "/location/statistical_region/population" raw-c)))))
 	    raw)))

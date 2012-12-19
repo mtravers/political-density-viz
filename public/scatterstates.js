@@ -28,7 +28,7 @@ queue()
     .defer(d3.json, "data/election-data-more-fixed.json")
     .await(ready);
 
-var clearSelection;
+var brushingClick;
 
 function ready(error, us, election) {
     var rateById = {};
@@ -37,7 +37,10 @@ function ready(error, us, election) {
 	.selectAll("path")
 	.data(topojson.object(us, us.objects.counties).geometries)
 	.enter().append("path")
-	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
+	.attr("class", function(d) { return "counties datapoint " + quantize(rateById[d.id]); })
+        .on("click", function(d) {
+	    alert(d.id);
+	})
 	.attr("d", path);
 
     map.append("path")
@@ -111,12 +114,15 @@ function ready(error, us, election) {
 	.attr("class", "brush")
 	.call(brush.x(x_scale).y(y_scale));
 
-    // not quite
     clearSelection = function() {
 	scatter.call(brush.clear());
 	map.call(brush2.clear());
-	scatter.classed("selecting", false);
-	map.classed("selecting", false);
+    };
+
+    brushingClick = function() {
+	var on = document.getElementById('brushing').checked;
+	 d3.selectAll('.brush').classed('hidden', !on);
+        clearSelection();	 
     };
 
     function brushstart(p) {
@@ -129,7 +135,8 @@ function ready(error, us, election) {
     }
 
     function brushend(p) {
-//	scatter.classed("selecting", false);
+	scatter.classed("selecting", false);
+	map.classed("selecting", false);
 	scatter.call(brush.clear());
     }
 
@@ -156,9 +163,10 @@ function ready(error, us, election) {
     var mx_scale = d3.scale.linear().domain([0,1000]).range([0,1000]);
     var my_scale = d3.scale.linear().domain([0,1000]).range([0,1000]);
 
-    map.append("g")
-	.attr("class", "brush")
-	.call(brush2.x(mx_scale).y(my_scale)); 
+    // temp off 
+    // map.append("g")
+    // 	.attr("class", "brush")
+    // 	.call(brush2.x(mx_scale).y(my_scale)); 
     
     function brushstart2(p) {
 	map.classed("selecting", true); 
@@ -169,14 +177,22 @@ function ready(error, us, election) {
 	}
     }
 
+    var selected;
+
     function brushend2(p) {
-//	map.classed("selecting", false);
+	map.classed("selecting", false);
+	scatter.classed("selecting", false);
 	map.call(brush2.clear());
+	scatter.selectAll(".datapoint")
+	    .sort(function (a, b) { 
+		if (selected[a['id']] && !selected[b['id']]) return 1; 
+		else return 0;
+	    });
     }
 
     function brush2(p) {
 	var e = brush2.extent();
-	var selected = {};
+	selected = {};
 	map.selectAll(".datapoint").classed("selected", function(d) {
 	    var centroid = path.centroid(d);
 	    var sel =  e[0][0] <= centroid[0] && centroid[0] <= e[1][0] && e[0][1] <= centroid[1] && centroid[1] <= e[1][1];
@@ -186,6 +202,7 @@ function ready(error, us, election) {
 	scatter.selectAll(".datapoint").classed("selected", function(d) {
 	    return selected[d['id']];
 	});
+	
     }
 }
 
