@@ -32,7 +32,7 @@ var brushingClick;
 
 function ready(error, us, election) {
     var rateById = {};
-    election.forEach(function (c) { rateById[c.id] = +c['dem%'];});
+    election.forEach(function (c) { rateById[c.id] = +c['dem%']; c['density'] = c['population'] / c['area'];});
     map
 	.selectAll("path")
 	.data(topojson.object(us, us.objects.counties).geometries)
@@ -44,31 +44,35 @@ function ready(error, us, election) {
 	.attr("d", path);
 
     map.append("path")
-	.datum(topojson.mesh(us, us.objects.states), function(a, b) { return a.id !== b.id; })
-	.attr("class", "states")
-	.attr("d", path);
+    	.datum(topojson.mesh(us, us.objects.states), function(a, b) { return a.id !== b.id; })
+    	.attr("class", "states")
+    	.attr("d", path);
 
     // scatter
 
-    var make_scale = function(values, prop, range_min, range_max) {
+    var make_linear_scale = function(values, prop, range_min, range_max) {
 	return d3.scale.linear()
 	    .domain([d3.min(values, function(c) { return c[prop]; }),
 		     d3.max(values, function(c) { return c[prop]; })])
             .range([range_min,range_max]);
     };
+    var make_log_scale = function(values, prop, range_min, range_max) {
+	return d3.scale.log()
+	    .domain([d3.min(values, function(c) { return c[prop]; }),
+		     d3.max(values, function(c) { return c[prop]; })])
+            .range([range_min,range_max]);
+    };
 
-    var x_scale = make_scale(election, 'log_density', s_margin.left, s_margin.left + s_width);
-    var y_scale = make_scale(election, 'dem%', s_margin.top + s_height, s_margin.top);
-    var population_scale = make_scale(election, 'population', 4, 900); // square of radius
+    var x_scale = make_log_scale(election, 'density', s_margin.left, s_margin.left + s_width);
+    var y_scale = make_linear_scale(election, 'dem%', s_margin.top + s_height, s_margin.top);
+    var population_scale = make_linear_scale(election, 'population', 4, 900); // square of radius
 
     scatter.selectAll("circle")
         .data(election)
         .enter().append("svg:circle")
-// bands look crappy -- how about a side scale?
 	.attr("class", function(d) { return "datapoint " + quantize(rateById[d.id]); })
-//	.attr("class", "datapoint")
         .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
-        .attr("cx", function(d) { return x_scale(d['log_density']); })
+        .attr("cx", function(d) { return x_scale(d['density']); })
         .attr("cy", function(d) { return y_scale(d['dem%']); })
         .append("svg:title").text(function(d) { return d['county'] + ", " + d['state']; });
 
@@ -102,7 +106,7 @@ function ready(error, us, election) {
 	.attr("x", s_width)
 	.attr("y", -6)
 	.style("text-anchor", "end")
-	.text("log(density)");
+	.text("density");
 
     // Brush.
     var brush = d3.svg.brush()
@@ -144,7 +148,7 @@ function ready(error, us, election) {
 	var e = brush.extent();
 	var selected = {};
 	scatter.selectAll(".datapoint").classed("selected", function(d) {
-	    var sel =  e[0][0] <= d['log_density'] && d['log_density'] <= e[1][0] && e[0][1] <= d['dem%'] && d['dem%'] <= e[1][1];
+	    var sel =  e[0][0] <= d['density'] && d['density'] <= e[1][0] && e[0][1] <= d['dem%'] && d['dem%'] <= e[1][1];
 	    selected[d['id']] = sel;
 	    return sel;
 	});
@@ -163,10 +167,9 @@ function ready(error, us, election) {
     var mx_scale = d3.scale.linear().domain([0,1000]).range([0,1000]);
     var my_scale = d3.scale.linear().domain([0,1000]).range([0,1000]);
 
-    // temp off 
-    // map.append("g")
-    // 	.attr("class", "brush")
-    // 	.call(brush2.x(mx_scale).y(my_scale)); 
+    map.append("g")
+     	.attr("class", "brush")
+     	.call(brush2.x(mx_scale).y(my_scale)); 
     
     function brushstart2(p) {
 	map.classed("selecting", true); 
