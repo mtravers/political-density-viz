@@ -50,10 +50,10 @@ function ready(error, us, election) {
 
     // scatter
 
-    var make_linear_scale = function(values, prop, range_min, range_max) {
+    var make_linear_scale = function(values, prop, range_min, range_max, domain_min, domain_max) {
 	return d3.scale.linear()
-	    .domain([d3.min(values, function(c) { return c[prop]; }),
-		     d3.max(values, function(c) { return c[prop]; })])
+	    .domain([domain_min || d3.min(values, function(c) { return c[prop]; }),
+		     domain_max || d3.max(values, function(c) { return c[prop]; })])
             .range([range_min,range_max]);
     };
     var make_log_scale = function(values, prop, range_min, range_max) {
@@ -64,7 +64,7 @@ function ready(error, us, election) {
     };
 
     var x_scale = make_log_scale(election, 'density', s_margin.left, s_margin.left + s_width);
-    var y_scale = make_linear_scale(election, 'dem%', s_margin.top + s_height, s_margin.top);
+    var y_scale = make_linear_scale(election, 'dem%', s_margin.top + s_height, s_margin.top, 0, 100);
     var population_scale = make_linear_scale(election, 'population', 4, 900); // square of radius
 
     scatter.selectAll("circle")
@@ -125,7 +125,7 @@ function ready(error, us, election) {
 
     brushingClick = function() {
 	var on = document.getElementById('brushing').checked;
-	 d3.selectAll('.brush').classed('hidden', !on);
+	d3.selectAll('.brush').classed('hidden', !on);
         clearSelection();	 
     };
 
