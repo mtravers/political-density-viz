@@ -1,16 +1,18 @@
-I had an impulse to visualize the (pretty obvious) observation that progressive politics is correlated with population density. <br/>
+I had an impulse to visualize the common intuition that progressive politics is positively correlated with population density. The result is this visualization, built on [[http://d3js.org/][d3.js]]. It shows two linked views of per-county data: a map and a scatterplot. 
 
 * Understanding the visualization
 
-Each circle in the scatterplot is a county; size represents population.<br/>
-The x-axis of the scatterplot is the population density (people/km<sup>2</sup>) on a log scale.<br/>
-The y-axis is % of the vote that went to Obama in the 2012 presidential election.<br/>
+Each circle in the scatterplot is a county; size represents population., color represents degree of Republican-leaning (red) vs Demicratic-leaning (blue) votes in the 2012 presidential election.
 
-Try selecting a region in the scatterplot or map.
+The x-axis of the scatterplot is the population density (people/km^2) on a log scale.
+The y-axis is % of the vote that was Democratic in the 2012 presidential election.
+
+Try clicking and dragging to select a region in the scatterplot or map.
+
+The correlation between density and ideology is pretty obviouos. Some interesting clusters pop out from the visualization, such as the small set of places that are low-denisity but Democratic, which appear to be rural areas with a racial minority population.
 
 * Data sources
 
-Election results: scraped from Politico: http://www.politico.com/2012-election/results/president/alabama/
-County density: Freebase
-Map: d3
+Election results: [[http://www.politico.com/2012-election/results/president/alabama/][Politico]]
+County area and population: [[http://www.freebase.com/][Freebase]]
 

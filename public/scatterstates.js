@@ -32,7 +32,12 @@ var brushingClick;
 
 function ready(error, us, election) {
     var rateById = {};
-    election.forEach(function (c) { rateById[c.id] = +c['dem%']; c['density'] = c['population'] / c['area'];});
+    election.forEach(function (c) {
+	rateById[c.id] = +c['dem%'];
+	if (isNaN(c['population'] / c['area'])) {
+	    alert('pkm');
+	}
+	c['density'] = c['population'] / c['area'];});
     map
 	.selectAll("path")
 	.data(topojson.object(us, us.objects.counties).geometries)
@@ -67,6 +72,18 @@ function ready(error, us, election) {
     var y_scale = make_linear_scale(election, 'dem%', s_margin.top + s_height, s_margin.top, 0, 100);
     var population_scale = make_linear_scale(election, 'population', 4, 900); // square of radius
 
+    // Brush
+
+    var brush = d3.svg.brush()
+	.on("brushstart", brushstart)
+	.on("brush", brush)
+	.on("brushend", brushend);
+
+    scatter.append("g")
+	.attr("class", "brush")
+	.call(brush.x(x_scale).y(y_scale));
+
+
     scatter.selectAll("circle")
         .data(election)
         .enter().append("svg:circle")
@@ -74,7 +91,8 @@ function ready(error, us, election) {
         .attr("r", function(d) { return Math.sqrt(population_scale(d['population'])); })
         .attr("cx", function(d) { return x_scale(d['density']); })
         .attr("cy", function(d) { return y_scale(d['dem%']); })
-        .append("svg:title").text(function(d) { return d['county'] + ", " + d['state']; });
+        .append("svg:title")
+	.text(function(d) { return d['county'] + ", " + d['state']; });
 
     var yAxis = d3.svg.axis()
 	    .scale(y_scale)
@@ -111,16 +129,6 @@ function ready(error, us, election) {
 	.style("text-anchor", "end")
 	.text("density");
 
-    // Brush
-
-    var brush = d3.svg.brush()
-	.on("brushstart", brushstart)
-	.on("brush", brush)
-	.on("brushend", brushend);
-
-    scatter.append("g")
-	.attr("class", "brush")
-	.call(brush.x(x_scale).y(y_scale));
 
     clearSelection = function() {
 	scatter.call(brush.clear());
