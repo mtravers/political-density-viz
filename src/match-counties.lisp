@@ -9,12 +9,11 @@
 
 
 (defvar *x-states
-      (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-states.json")))
+  (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-states.json")))
 
 ;;; List of ((:TYPE . "Feature") (:ID . "01001") (:PROPERTIES (:NAME . "Autauga")) (:GEOMETRY (:TYPE . "Polygon") (:COORDINATES ((-86.41178 32.70634) (-86.41178 32.410587) (-86.49941 32.344864) (-86.81708 32.33939) (-86.915665 32.662525) (-86.41178 32.70634)))))
 (defvar *x-counties
   (mql-assocdr :features (json:decode-json-from-source #P"/misc/working/election/data/us-counties.json")))
-
 
 (defun +get (prop tuple)
   (mql-assocdr prop tuple))
@@ -61,13 +60,11 @@
   (sqrt (+ (expt (- (+get :x-center a)(+get :x-center b)) 2)
 	   (expt (- (+get :y-center a)(+get :y-center b)) 2))))
 
-
 (mapc #'(lambda (+county)
 	  (mt:report-and-ignore-errors 
 	    (let ((state (find-state +county)))
 	      (+put :state +county (+get :name (+get :properties state))))))
       *x-counties)
-
 
 (with-open-file (s "/misc/working/election/data/us-counties-plus.json" :direction :output :if-exists :supersede)
   ;; +++ haven't tested this but som ekind of wrapping is necessary

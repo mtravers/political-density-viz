@@ -85,6 +85,7 @@ function ready(error, us, election) {
 	    .orient("bottom");    
 
     // y axis
+
     scatter.append("g")
       .attr("class", "y axis")
 	.attr("transform", "translate(" + s_margin.left + ",0)")
@@ -97,6 +98,8 @@ function ready(error, us, election) {
 	.style("text-anchor", "end")
 	.text("% Democratic");
 
+    // x axis
+
     scatter.append("g")
 	.attr("class", "x axis")
 	.attr("transform", "translate(0," + (s_height + s_margin.top) + ")")
@@ -108,7 +111,8 @@ function ready(error, us, election) {
 	.style("text-anchor", "end")
 	.text("density");
 
-    // Brush.
+    // Brush
+
     var brush = d3.svg.brush()
 	.on("brushstart", brushstart)
 	.on("brush", brush)

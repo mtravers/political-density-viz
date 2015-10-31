@@ -1,0 +1,16 @@
+I had an impulse to visualize the (pretty obvious) observation that progressive politics is correlated with population density. <br/>
+
+* Understanding the visualization
+
+Each circle in the scatterplot is a county; size represents population.<br/>
+The x-axis of the scatterplot is the population density (people/km<sup>2</sup>) on a log scale.<br/>
+The y-axis is % of the vote that went to Obama in the 2012 presidential election.<br/>
+
+Try selecting a region in the scatterplot or map.
+
+* Data sources
+
+Election results: scraped from Politico: http://www.politico.com/2012-election/results/president/alabama/
+County density: Freebase
+Map: d3
+

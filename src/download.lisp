@@ -1,11 +1,7 @@
-(ql:quickload '(:drakma :cl-json :wuwei :cl-html-parse))
+(ql:quickload '(:drakma :cl-json :mtlisp :cl-html-parse))
+(load "html-utils")
 
 ;;; Retrieve electoral data
-
-#|
-(net.html.parser:parse-html
- (drakma:http-request "http://www.politico.com/2012-election/results/president/alabama/"))
-|#
 
 (defun retrieve-state (state)
   (net.html.parser:parse-html
@@ -18,7 +14,7 @@
     counties))
     
 #|
-;;; Results in something like:
+;;; Results are something like:
 ((:TBODY :ID "county1001")
   ((:TR :CLASS "party-republican race-winner")
    ((:TH :ROWSPAN "5" :CLASS "results-county") "Autauga "
@@ -35,14 +31,15 @@
  ... third parties)
 |#
 
-(defun parse-dumb-number (num-string)
+(defun parse-comma-number (num-string)
   (parse-integer (mt:string-replace num-string "," "")))
 
 (defun parse-county (county-html)
-  (let ((county (mt:string-trim-whitespace  (html-contents (html-find-element county-html (class-selector "results-county")))))
+  (let ((county (mt:string-trim-whitespace
+		 (html-contents (html-find-element county-html (class-selector "results-county")))))
 	(results
 	 (mapcar #'(lambda (result-row)
-		     (let ((popular (parse-dumb-number
+		     (let ((popular (parse-comma-number
 				     (html-contents (html-find-element result-row (class-selector "results-popular")))))
 			   (party (html-contents (cadr
 						  (html-find-element result-row (class-selector "results-party"))))))
@@ -50,8 +47,6 @@
 		 ;; result rows
 		 (html-find-elements county-html (tag-selector :tr)))))
     (list county results)))
-	 
-(defvar *all-counties* (mt:mapappend  #'cadr *by-county-electoral-results*))
 
 (defvar *states*
   '("Alabama"
@@ -152,6 +147,7 @@
   (some #'(lambda (c) (and (equal state (+get :state c)) (equal county (+get :name (+get :properties c))) c))
 	*x-counties))
 
+;;; ??? *m-county-info* not setup anywhere
 (defun lookup-m-county (state county)
   (find county (cadr (find state *m-county-info* :key #'car :test #'equal))
 	:key #'car :test #'equal))
@@ -200,8 +196,7 @@
        (with-open-file (i "/misc/working/election/data/unbroken.lisp")
 	 (read i))))
 
-
-;;; Oh fuck me.
+;;; PKM
 
 (multiple-value-setq (*unbroken-no-id* *unbroken-id*)
   (mt:split-list #'(lambda (x) (null (mql-assocdr :id x))) *unbroken*))
@@ -252,13 +247,8 @@
       (mt:push-end (cons  :log--density (float (log (/ (mt:assocdr :population u) (mt:assocdr :area u))))) u))))
 
 
-(length
- (setq *fuckme*
-       (mt:filter #'null *election-fixed* :key (json-accessor :log--density))))
-
 (with-open-file (o "/misc/working/election/public/data/election-data-more-fixed.json" :direction :output :if-exists :supersede)
   (json:encode-json *election-fixed* o))
-
 
 (defmacro blank-on-error (exp)
   `(or (ignore-errors ,exp)

@@ -1,6 +1,6 @@
 For release:
 - final data cleaning
-- fix brushing
+-/ fix brushing
 - legend
 - Better fonts, css
 - credits, explanation, apology
