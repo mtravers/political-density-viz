@@ -1,3 +1,5 @@
+;;; https://github.com/mtravers/cl-mql
+
 (ql:quickload :cl-mql)
 
 (defun uncounty (s)
@@ -7,7 +9,7 @@
 
 (defun state-counties-raw-mql (state)
 	 (mql-read
-	  `(("/location/location/area")
+	  `((("/location/location/area")
 	    ("/location/location/containedby"
 	     (("id") ("name" . ,state)))
 	    ("/location/statistical_region/population"
@@ -18,7 +20,7 @@
 	    ("id")
 	    ("limit" . 500)
 	    ("name")
-	    ("type" . "/location/us_county"))))  
+	    ("type" . "/location/us_county")))))  
 
 (defun state-counties (state)
   (let ((raw (state-counties-raw-mql state)))
