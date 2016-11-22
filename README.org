@@ -2,6 +2,8 @@ I had an impulse to visualize the common intuition that progressive politics is 
 
 * Understanding the visualization
 
+[[http://hyperphor.com/election/scatterstates.html][You can see the visualization here]].
+
 Each circle in the scatterplot is a county; size represents population., color represents degree of Republican-leaning (red) vs Demicratic-leaning (blue) votes in the 2012 presidential election.
 
 The x-axis of the scatterplot is the population density (people/km^2) on a log scale.
@@ -9,10 +11,10 @@ The y-axis is % of the vote that was Democratic in the 2012 presidential electio
 
 Try clicking and dragging to select a region in the scatterplot or map.
 
-The correlation between density and ideology is pretty obviouos. Some interesting clusters pop out from the visualization, such as the small set of places that are low-denisity but Democratic, which appear to be rural areas with a racial minority population.
+The correlation between density and ideology is pretty obvious. Some interesting clusters pop out from the visualization, such as the small set of places that are low-denisity but Democratic, which appear to be rural areas with a racial minority population.
 
 * Data sources
 
-Election results: [[http://www.politico.com/2012-election/results/president/alabama/][Politico]]
-County area and population: [[http://www.freebase.com/][Freebase]]
+- Election results: [[http://www.politico.com/2012-election/results/president/alabama/][Politico]]
+- County area and population: [[http://www.freebase.com/][Freebase]]
 
