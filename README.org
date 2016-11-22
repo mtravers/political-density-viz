@@ -1,5 +1,9 @@
 I had an impulse to visualize the common intuition that progressive politics is positively correlated with population density. The result is this visualization, built on [[http://d3js.org/][d3.js]]. It shows two linked views of per-county data: a map and a scatterplot. 
 
+#+attr_html: :width 700px
+[[https://raw.githubusercontent.com/mtravers/political-density-viz/master/public/screenshot.png]]
+
+
 * Understanding the visualization
 
 [[http://hyperphor.com/election/scatterstates.html][You can see the visualization here]].
