@@ -4,7 +4,7 @@ I had an impulse to visualize the common intuition that progressive politics is 
 
 [[http://hyperphor.com/election/scatterstates.html][You can see the visualization here]].
 
-Each circle in the scatterplot is a county; size represents population., color represents degree of Republican-leaning (red) vs Demicratic-leaning (blue) votes in the 2012 presidential election.
+Each circle in the scatterplot is a county; size represents population., color represents degree of Republican-leaning (red) vs Democratic-leaning (blue) votes in the 2012 presidential election.
 
 The x-axis of the scatterplot is the population density (people/km^2) on a log scale.
 The y-axis is % of the vote that was Democratic in the 2012 presidential election.
